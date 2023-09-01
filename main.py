@@ -1,6 +1,6 @@
 import argparse
 import sys
-sys.path.insert(0, '../src/topicmodeling')
+sys.path.insert(0, 'src/topicmodeling')
 from model import TopicModel
 from datasets import load_dataset
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity

@@ -1,6 +1,6 @@
 
 
-# My Paper Title
+# vONTSS: vMF based semi-supervised neural topic modeling with optimal transport
 
 This repository is the official implementation of [vONTSS: vMF based semi-supervised neural topic modeling with optimal transport](https://aclanthology.org/2023.findings-acl.271.pdf). 
 
@@ -19,42 +19,77 @@ pip install -r requirements.txt
 To train and evaluate the model, run this command:
 
 ```train
-python train.py --input-data <path_to_data> --alpha 10 --beta 20
+python3 main.py --data_source xwjzds/ag_news --metric diversity --topk 20
 ```
 
->📋  Describe how to train the models, with example commands on how to train the models in your paper, including the full training procedure and appropriate hyperparameters.
+Step 1: If the data is in the huggingface. specify --data_source as the repository of hugging face
+If the data is a csv file specify where the data is and specify --data_source csv
+Step 2: Define number of topics. if the number is 10 use --numb_embeddings 10
+Step 3: Define the metric you want to evaluate, currently it supports diversity, c_v, c_uci, etc
 
-## Evaluation
-
-To evaluate my model on ImageNet, run:
-
-```eval
-python eval.py --model-file mymodel.pth --benchmark imagenet
+Then you just have to run 
+```train
+python3 main.py --data_source xwjzds/ag_news --metric diversity --topk 20
 ```
+It will out put the diversity and c_v metric using data in xwjzds/ag_news 
 
->📋  Describe how to evaluate the trained models on benchmarks reported in the paper, give commands that produce the results (section below).
+## Interactive Notebook
+You can find unsupervised examples under examples vONT_example.ipynb
+You can find semi-supervised examples under examples vONTSS_example.ipynb
 
-## Pre-trained Models
 
-You can download pretrained models here:
 
-- [My awesome model](https://drive.google.com/mymodel.pth) trained on ImageNet using parameters x,y,z. 
+## Arugument Explain
 
->📋  Give a link to where/how the pretrained models can be downloaded and how they were trained (if applicable).  Alternatively you can have an additional column in your results table with a link to the models.
+Arguments Explained:
+
+--numb_embeddings: Number of embeddings (default is 10).
+--epochs: Number of epochs for training (default is 20).
+--batch_size: Batch size for training (default is 256).
+--gpu_num: GPU number to use (default is 1).
+--learning_rate: Learning rate (default is 0.002).
+--weight_decay: Weight decay (default is 1.2e-6).
+--penalty: Penalty term (default is 1).
+--beta: Beta value (default is 1).
+--temp: Temperature (default is 10).
+--data_source: Data source type (default is 'huggingface'). Can be 'huggingface', 'csv', or 'txt'.
+--data_path: Path to the data file for 'csv' or 'txt' (default is '').
+--metrics: List of metrics to report (default is ['diversity', 'c_v', 'c_npmi', 'c_uci', 'u_mass']).
+--topk: Top k words to report for diversity (default is 10).
+
+
 
 ## Results
 
-Our model achieves the following performance on :
-
-### [Image Classification on ImageNet](https://paperswithcode.com/sota/image-classification-on-imagenet)
-
-| Model name         | Top 1 Accuracy  | Top 5 Accuracy |
-| ------------------ |---------------- | -------------- |
-| My awesome model   |     85%         |      95%       |
-
->📋  Include a table of results from your paper, and link back to the leaderboard for clarity and context. If your main result is a figure, include that figure and link to the command or notebook to reproduce it. 
+Our model achieves the following performance on Ag News: 
 
 
-## Contributing
 
->📋  Pick a licence and describe how to contribute to your code repository. 
+| Model name         | Diversity       | C_v            | C_npmi         |
+| ------------------ |---------------- | -------------- | -------------- |
+| vONT               |     0.865       |      0.618     | 0.115          |
+
+
+we use existed embeddings in this code relase instead of using spherical embeddings. Training a spherical embeddings takes time. We noticed that this reported performance is better than the performance on our paper. 
+
+
+## Citation
+```
+@inproceedings{xu-etal-2023-vontss,
+    title = "v{ONTSS}: v{MF} based semi-supervised neural topic modeling with optimal transport",
+    author = "Xu, Weijie  and
+      Jiang, Xiaoyu  and
+      Sengamedu Hanumantha Rao, Srinivasan  and
+      Iannacci, Francis  and
+      Zhao, Jinjin",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2023",
+    month = jul,
+    year = "2023",
+    address = "Toronto, Canada",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.findings-acl.271",
+    doi = "10.18653/v1/2023.findings-acl.271",
+    pages = "4433--4457",
+    abstract = "Recently, Neural Topic Models (NTM), inspired by variational autoencoders, have attracted a lot of research interest; however, these methods have limited applications in the real world due to the challenge of incorporating human knowledge. This work presents a semi-supervised neural topic modeling method, vONTSS, which uses von Mises-Fisher (vMF) based variational autoencoders and optimal transport. When a few keywords per topic are provided, vONTSS in the semi-supervised setting generates potential topics and optimizes topic-keyword quality and topic classification. Experiments show that vONTSS outperforms existing semi-supervised topic modeling methods in classification accuracy and diversity. vONTSS also supports unsupervised topic modeling. Quantitative and qualitative experiments show that vONTSS in the unsupervised setting outperforms recent NTMs on multiple aspects: vONTSS discovers highly clustered and coherent topics on benchmark datasets. It is also much faster than the state-of-the-art weakly supervised text classification method while achieving similar classification performance. We further prove the equivalence of optimal transport loss and cross-entropy loss at the global minimum.",
+}
+```
