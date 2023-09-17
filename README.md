@@ -1,11 +1,15 @@
 
 
-# vONTSS: vMF based semi-supervised neural topic modeling with optimal transport
+# vONTSS: vMF based semi-supervised neural topic modeling with optimal transport (Accepted by ACL 2023 as Findings)
 
 This repository is the official implementation of [vONTSS: vMF based semi-supervised neural topic modeling with optimal transport](https://aclanthology.org/2023.findings-acl.271.pdf). 
 
+vONTSS is a topic modeling method.
 
-## Requirements
+
+## Installation
+
+
 
 To install requirements:
 
@@ -18,9 +22,7 @@ pip install -r requirements.txt
 
 To train and evaluate the model, run this command:
 
-```train
-python3 main.py --data_source xwjzds/ag_news --metric diversity --topk 20
-```
+
 
 Step 1: If the data is in the huggingface. specify --data_source as the repository of hugging face
 If the data is a csv file specify where the data is and specify --data_source csv
@@ -31,30 +33,85 @@ Then you just have to run
 ```train
 python3 main.py --data_source xwjzds/ag_news --metric diversity --topk 20
 ```
-It will out put the diversity and c_v metric using data in xwjzds/ag_news 
-
-## Interactive Notebook
-You can find unsupervised examples under examples vONT_example.ipynb
-You can find semi-supervised examples under examples vONTSS_example.ipynb
+It will output the diversity metric using data in xwjzds/ag_news 
 
 
+## Interactive Code
+
+Example of using dataset from OCTIS
+
+
+
+```python
+from octis.dataset.dataset import Dataset
+import sys
+sys.path.insert(0, '../src/topicmodeling')
+from model import TopicModel
+from datasets import load_dataset
+from octis.evaluation_metrics.diversity_metrics import TopicDiversity
+from octis.evaluation_metrics.coherence_metrics import Coherence
+
+
+dataset = Dataset()
+dataset.fetch_dataset("20NewsGroup") #It can support 20NewsGroup, BBC_News, DBLP, DBPedia_IT
+tm = TopicModel(numb_embeddings = 10)
+texts = [' '.join(i) for i in dataset.get_corpus()]
+model_output = tm.train_model(texts)
+metric = TopicDiversity(topk=10)
+topic_diversity_score = metric.score(model_output) # Compute score of diversity
+cmetric = Coherence(texts =  tm.tp.lemmas,  measure='c_npmi')
+coherence = cmetric.score(model_output) # Compute score of coherence
+```
+
+Example of using datasets from huggingface
+```python
+import sys
+sys.path.insert(0, '../src/topicmodeling')
+from model import TopicModel
+from datasets import load_dataset
+from octis.evaluation_metrics.diversity_metrics import TopicDiversity
+from octis.evaluation_metrics.coherence_metrics import Coherence
+
+
+df = load_dataset('xwjzds/ag_news')
+tm = TopicModel(numb_embeddings = 10)
+
+model_output = tm.train_model(df['train']['text'])
+metric = TopicDiversity(topk=10)
+topic_diversity_score = metric.score(model_output) # Compute score of diversity
+cmetric = Coherence(texts =  tm.tp.lemmas,  measure='c_npmi')
+coherence = cmetric.score(model_output) # Compute score of coherence
+
+```
 
 ## Arugument Explain
 
 Arguments Explained:
 
 --numb_embeddings: Number of embeddings (default is 10).
+
 --epochs: Number of epochs for training (default is 20).
+
 --batch_size: Batch size for training (default is 256).
+
 --gpu_num: GPU number to use (default is 1).
+
 --learning_rate: Learning rate (default is 0.002).
+
 --weight_decay: Weight decay (default is 1.2e-6).
+
 --penalty: Penalty term (default is 1).
+
 --beta: Beta value (default is 1).
+
 --temp: Temperature (default is 10).
+
 --data_source: Data source type (default is 'huggingface'). Can be 'huggingface', 'csv', or 'txt'.
+
 --data_path: Path to the data file for 'csv' or 'txt' (default is '').
+
 --metrics: List of metrics to report (default is ['diversity', 'c_v', 'c_npmi', 'c_uci', 'u_mass']).
+
 --topk: Top k words to report for diversity (default is 10).
 
 

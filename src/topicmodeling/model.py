@@ -506,11 +506,44 @@ class TopicModel:
         df = pd.DataFrame(data, columns=["Topic", "Name", "Top_n_words", "Representative_Doc", "Num_Docs"])
         return df
     
-    def train_model(self, dataset, top_words = 100, index = []):
+    def train_model(self, dataset, hyperparameters={}, top_words=10):
+        
+        self.top_n_words = top_words    
+        # Extract hyperparameters and set them as attributes
+        if 'epochs' in hyperparameters:
+            self.epochs = hyperparameters['epochs']
+        if 'batch_size' in hyperparameters:
+            self.batch_size = hyperparameters['batch_size']
+        if 'gpu_num' in hyperparameters:
+            self.gpu_num = hyperparameters['gpu_num']
+        if 'numb_embeddings' in hyperparameters:
+            self.numb_embeddings = hyperparameters['numb_embeddings']
+        if 'learning_rate' in hyperparameters:
+            self.learning_rate = hyperparameters['learning_rate']
+        if 'weight_decay' in hyperparameters:
+            self.weight_decay = hyperparameters['weight_decay']
+        if 'penalty' in hyperparameters:
+            self.penalty = hyperparameters['penalty']
+        if 'beta' in hyperparameters:
+            self.beta = hyperparameters['beta']
+        if 'temp' in hyperparameters:
+            self.temp = hyperparameters['temp']
+        
+        if 'num_representative_docs' in hyperparameters:
+            self.num_representative_docs = hyperparameters['num_representative_docs']
+        if 'top_n_topics' in hyperparameters:
+            self.top_n_topics = hyperparameters['top_n_topics']
+        if 'embedding_dim' in hyperparameters:
+            self.embedding_dim = hyperparameters['embedding_dim']
+
+        # Check if the model has been trained
         if self.z is None:
-            self.fit_transform(dataset, index)
+            self.fit_transform(dataset)
+
+        # Create the model output
         model_output = {}
         model_output['topics'] = [i[:top_words] for i in self.topics]
         model_output['topic-word-matrix'] = self.model.topics.get_topics().cpu().detach().numpy()
         model_output['topic-document-matrix'] = self.z.T
+
         return model_output
