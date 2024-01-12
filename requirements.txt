@@ -9,5 +9,4 @@ octis==1.13.1
 cudatoolkit==10.1
 nltk==3.5
 huggingface-hub==0.16.4
-gensim==4.2.0
 seaborn==0.13.1
