@@ -31,7 +31,7 @@ Step 3: Define the metric you want to evaluate, currently it supports diversity,
 
 Then you just have to run 
 ```train
-python3 main.py --data_source xwjzds/ag_news --metric diversity --topk 20
+python3 main.py --data_path xwjzds/ag_news --metric diversity --topk 20
 ```
 It will output the diversity metric using data in xwjzds/ag_news 
 
